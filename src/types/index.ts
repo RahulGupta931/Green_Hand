@@ -1,15 +1,16 @@
 export interface Product {
   id: number;
   name: string;
+  wholesell_price?: number;
   price: number;
-  image: string;
+  image?: string;
   category: string;
   description: string;
   care: string;
   light: 'low' | 'medium' | 'high';
   water: 'low' | 'medium' | 'high';
   featured: boolean;
-  stock: number;
+  stock?: number;
 }
 
 export interface CartItem {

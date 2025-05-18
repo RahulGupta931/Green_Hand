@@ -116,9 +116,9 @@ const ProductDetail: React.FC = () => {
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-medium text-gray-900">Quantity</h3>
                 <span className="text-gray-600 text-sm">
-                  {product.stock > 10 
+                  {product.stock && product.stock > 10 
                     ? 'In stock' 
-                    : product.stock > 0 
+                    : product.stock && product.stock > 0 
                       ? `Only ${product.stock} left!` 
                       : 'Out of stock'}
                 </span>
@@ -135,7 +135,7 @@ const ProductDetail: React.FC = () => {
                   onClick={handleAddToCart}
                   disabled={product.stock === 0}
                   className={`flex-grow flex items-center justify-center space-x-2 py-3 px-6 rounded-md font-medium ${
-                    product.stock > 0 
+                    product.stock && product.stock > 0 
                       ? 'bg-green-600 text-white hover:bg-green-700' 
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   } transition-colors`}

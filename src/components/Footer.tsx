@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Leaf, Mail, Phone, MapPin, Instagram, Facebook, Twitter } from 'lucide-react';
+import {Mail, Phone, MapPin, Instagram, Facebook, Twitter } from 'lucide-react';
+import favicon from '../assets/favicon.png';
 
 const Footer: React.FC = () => {
   return (
@@ -9,17 +10,17 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <Link to="/" className="flex items-center space-x-2 text-xl font-bold mb-4">
-              <Leaf className="h-6 w-6" />
+              <img src={favicon} className='h-8 w-8' alt="footer-logo" />
               <span>GreenHand</span>
             </Link>
             <p className="text-green-100 mb-4">
               Bringing nature into your living spaces with the finest selection of plants.
             </p>
             <div className="flex space-x-4">
-              <a href="https://instagram.com" className="text-green-100 hover:text-white transition-colors">
+              <a href="https://www.instagram.com/greenhand.store/" className="text-green-100 hover:text-white transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="https://facebook.com" className="text-green-100 hover:text-white transition-colors">
+              <a href="https://www.facebook.com/profile.php?id=61576732100893" className="text-green-100 hover:text-white transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
               <a href="https://twitter.com" className="text-green-100 hover:text-white transition-colors">
