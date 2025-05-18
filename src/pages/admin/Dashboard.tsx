@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BarChart3, Package, Users, DollarSign, Settings, LogOut } from 'lucide-react';
+import { BarChart3, Package, Users, DollarSign, Settings, LogOut, Plus } from 'lucide-react';
+import ProductManager from './components/ProductManager';
+import BannerManager from './components/BannerManager';
+import FAQManager from './components/FAQManager';
+import OrderManager from './components/OrderManager';
 
 const Dashboard: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'banners' | 'faqs' | 'orders'>('overview');
+
   const stats = [
     { 
       title: 'Total Sales', 
@@ -30,14 +36,6 @@ const Dashboard: React.FC = () => {
     }
   ];
 
-  const recentOrders = [
-    { id: '#12345', customer: 'John Doe', date: '2024-03-15', total: '₹8,999', status: 'Completed' },
-    { id: '#12344', customer: 'Jane Smith', date: '2024-03-15', total: '₹12,999', status: 'Processing' },
-    { id: '#12343', customer: 'Mike Johnson', date: '2024-03-14', total: '₹5,999', status: 'Shipped' },
-    { id: '#12342', customer: 'Sarah Williams', date: '2024-03-14', total: '₹14,999', status: 'Completed' },
-    { id: '#12341', customer: 'Tom Brown', date: '2024-03-13', total: '₹7,999', status: 'Processing' }
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Navigation */}
@@ -60,90 +58,119 @@ const Dashboard: React.FC = () => {
       </nav>
 
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="bg-gray-50 rounded-lg p-3">
-                  {stat.icon}
-                </div>
-                <span className={`text-sm font-medium ${
-                  stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {stat.change}
-                </span>
-              </div>
-              <h3 className="text-gray-500 text-sm font-medium">{stat.title}</h3>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
-            </div>
-          ))}
+        {/* Tab Navigation */}
+        <div className="mb-8 border-b border-gray-200">
+          <nav className="flex space-x-8">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`pb-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'overview'
+                  ? 'border-green-500 text-green-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab('products')}
+              className={`pb-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'products'
+                  ? 'border-green-500 text-green-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Products & Categories
+            </button>
+            <button
+              onClick={() => setActiveTab('banners')}
+              className={`pb-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'banners'
+                  ? 'border-green-500 text-green-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Banners
+            </button>
+            <button
+              onClick={() => setActiveTab('faqs')}
+              className={`pb-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'faqs'
+                  ? 'border-green-500 text-green-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              FAQs
+            </button>
+            <button
+              onClick={() => setActiveTab('orders')}
+              className={`pb-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'orders'
+                  ? 'border-green-500 text-green-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Orders
+            </button>
+          </nav>
         </div>
 
-        {/* Recent Orders */}
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Recent Orders</h2>
+        {/* Content Area */}
+        {activeTab === 'overview' && (
+          <div className="space-y-6">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {stats.map((stat, index) => (
+                <div key={index} className="bg-white rounded-lg shadow-sm p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      {stat.icon}
+                    </div>
+                    <span className={`text-sm font-medium ${
+                      stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {stat.change}
+                    </span>
+                  </div>
+                  <h3 className="text-gray-500 text-sm font-medium">{stat.title}</h3>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Quick Actions */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button
+                  onClick={() => setActiveTab('products')}
+                  className="flex items-center justify-center space-x-2 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:text-green-500 transition-colors"
+                >
+                  <Plus className="h-5 w-5" />
+                  <span>Add New Product</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('banners')}
+                  className="flex items-center justify-center space-x-2 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:text-green-500 transition-colors"
+                >
+                  <Plus className="h-5 w-5" />
+                  <span>Create Banner</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('orders')}
+                  className="flex items-center justify-center space-x-2 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:text-green-500 transition-colors"
+                >
+                  <Package className="h-5 w-5" />
+                  <span>View Orders</span>
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Order ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Customer
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {recentOrders.map((order) => (
-                  <tr key={order.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {order.id}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {order.customer}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {order.date}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {order.total}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        order.status === 'Completed' ? 'bg-green-100 text-green-800' :
-                        order.status === 'Processing' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-blue-100 text-blue-800'
-                      }`}>
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <Link to={`/admin/orders/${order.id}`} className="text-green-600 hover:text-green-900">
-                        View Details
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        )}
+
+        {activeTab === 'products' && <ProductManager />}
+        {activeTab === 'banners' && <BannerManager />}
+        {activeTab === 'faqs' && <FAQManager />}
+        {activeTab === 'orders' && <OrderManager />}
       </div>
     </div>
   );

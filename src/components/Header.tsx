@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Menu, X, Search, Leaf } from 'lucide-react';
+import { ShoppingCart, Menu, X, Search} from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import logo from '../assets/greenhand_logo.png';
+
+
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,7 +37,7 @@ const Header: React.FC = () => {
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link to="/" className="flex items-center space-x-2 text-2xl font-bold text-green-800">
-          <Leaf className="h-8 w-8" />
+          <img src={logo} alt="GreenHand Logo" className="h-10 w-10" />
           <span>GreenHand</span>
         </Link>
 
