@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
@@ -10,6 +9,10 @@ import Contact from './pages/Contact';
 import AdminLogin from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import { CartProvider } from './context/CartContext';
+import Faq from './pages/Faq';
+import AboutUs from './pages/AboutUs';
+import PrivacyPolicy from './pages/PrivacyPolice';
+import TermsAndConditions from './pages/TermsAndConditions';
 
 function App() {
   return (
@@ -27,6 +30,10 @@ function App() {
           <Route path="/cart" element={<Layout><Cart /></Layout>} />
           <Route path="/care-guide" element={<Layout><CareGuide /></Layout>} />
           <Route path="/contact" element={<Layout><Contact /></Layout>} />
+          <Route path="/faq" element={<Layout><Faq /></Layout>} />
+          <Route path="/about" element={<Layout><AboutUs /></Layout>} />
+          <Route path="/privacy" element={<Layout><PrivacyPolicy /></Layout>} />
+          <Route path="/terms" element={<Layout><TermsAndConditions /></Layout>} />
         </Routes>
       </Router>
     </CartProvider>
