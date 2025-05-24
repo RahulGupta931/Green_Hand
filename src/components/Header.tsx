@@ -41,7 +41,7 @@ const Header: React.FC = () => {
         isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'
       }`}
     >
-      <div className="mx-auto px-16 flex justify-between items-center">
+      <div className="mx-auto lg:px-14 md:max-w-7xl sm:max-w-7xl px-4 lg:max-w-none flex justify-between items-center">
         <Link to="/" className="flex items-center space-x-2 text-2xl font-bold text-green-800">
         <img src={logo} alt="GreenHand Logo" className="h-10 w-10" />
           <span>GreenHand</span>

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, Phone, MapPin } from 'lucide-react';
+import { Mail, Lock, User, Phone } from 'lucide-react';
 import { useAuth, CustomerProfile } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import logo from '../assets/greenhand_logo.png';
+import { indianStates } from '../data/states';
 
 const SignUp: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -12,16 +13,22 @@ const SignUp: React.FC = () => {
     firstName: '',
     lastName: '',
     phone: '',
-    address: ''
+    address: '',
+    locality: '',
+    city: '',
+    state: '',
+    country: 'India',
+    pincode: '',
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { signUp } = useAuth();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,13 +39,18 @@ const SignUp: React.FC = () => {
         first_name: formData.firstName,
         last_name: formData.lastName,
         phone: formData.phone,
-        address: formData.address
+        address: formData.address,
+        locality: formData.locality,
+        city: formData.city,
+        state: formData.state,
+        country: formData.country,
+        pincode: formData.pincode,
       };
 
       const { error } = await signUp(formData.email, formData.password, profileData);
       if (error) throw error;
 
-      toast.success('Account created successfully! Please check your email to verify your account.');
+      toast.success('Account created successfully! Please verify your email.');
       navigate('/login');
     } catch (error: any) {
       console.error('Signup error:', error);
@@ -76,10 +88,9 @@ const SignUp: React.FC = () => {
                       name={id}
                       type="text"
                       required
-                      autoComplete={id}
                       value={formData[id as keyof typeof formData]}
                       onChange={handleInputChange}
-                      className="peer w-full rounded-lg border border-gray-300 px-4 py-2 pl-11 text-sm placeholder-gray-400 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
+                      className="peer w-full rounded-lg border border-gray-300 px-4 py-2 pl-11 text-sm shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
                       placeholder={label}
                     />
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -88,59 +99,137 @@ const SignUp: React.FC = () => {
               ))}
             </div>
 
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block mb-1 text-sm font-medium text-gray-700">Email address</label>
-              <div className="relative">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="peer w-full rounded-lg border border-gray-300 px-4 py-2 pl-11 text-sm placeholder-gray-400 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
-                  placeholder="Enter your email"
-                />
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            {/* Email & Phone */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="email" className="block mb-1 text-sm font-medium text-gray-700">Email address</label>
+                <div className="relative">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="peer w-full rounded-lg border border-gray-300 px-4 py-2 pl-11 text-sm shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
+                    placeholder="Enter your email"
+                  />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="phone" className="block mb-1 text-sm font-medium text-gray-700">Phone Number</label>
+                <div className="relative">
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    required
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className="peer w-full rounded-lg border border-gray-300 px-4 py-2 pl-11 text-sm shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
+                    placeholder="Enter your phone number"
+                  />
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                </div>
               </div>
             </div>
 
-            {/* Phone */}
-            <div>
-              <label htmlFor="phone" className="block mb-1 text-sm font-medium text-gray-700">Phone Number</label>
-              <div className="relative">
+            {/* Address Fields */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Address Line */}
+              <div>
+                <label htmlFor="address" className="block mb-1 text-sm font-medium text-gray-700">Address Line</label>
                 <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  required
-                  autoComplete="tel"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  className="peer w-full rounded-lg border border-gray-300 px-4 py-2 pl-11 text-sm placeholder-gray-400 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
-                  placeholder="Enter your phone number"
-                />
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              </div>
-            </div>
-
-            {/* Address */}
-            <div>
-              <label htmlFor="address" className="block mb-1 text-sm font-medium text-gray-700">Address</label>
-              <div className="relative">
-                <textarea
                   id="address"
                   name="address"
-                  rows={3}
+                  type="text"
                   required
                   value={formData.address}
                   onChange={handleInputChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 pr-10 text-sm placeholder-gray-400 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none resize-none"
-                  placeholder="Enter your full address"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
+                  placeholder="e.g. 123 MG Road"
                 />
-                <MapPin className="absolute top-3 right-3 text-gray-400" />
+              </div>
+
+              {/* Locality */}
+              <div>
+                <label htmlFor="locality" className="block mb-1 text-sm font-medium text-gray-700">Locality</label>
+                <input
+                  id="locality"
+                  name="locality"
+                  type="text"
+                  required
+                  value={formData.locality}
+                  onChange={handleInputChange}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
+                  placeholder="e.g. Andheri East"
+                />
+              </div>
+
+              {/* City */}
+              <div>
+                <label htmlFor="city" className="block mb-1 text-sm font-medium text-gray-700">City</label>
+                <input
+                  id="city"
+                  name="city"
+                  type="text"
+                  required
+                  value={formData.city}
+                  onChange={handleInputChange}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
+                  placeholder="e.g. Mumbai"
+                />
+              </div>
+
+              {/* State Dropdown */}
+              <div>
+                <label htmlFor="state" className="block mb-1 text-sm font-medium text-gray-700">State</label>
+                <select
+                  id="state"
+                  name="state"
+                  required
+                  value={formData.state}
+                  onChange={handleInputChange}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
+                >
+                  <option value="">Select State</option>
+                  {indianStates.map(state => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Country (fixed) */}
+              <div>
+                <label htmlFor="country" className="block mb-1 text-sm font-medium text-gray-700">Country</label>
+                <input
+                  id="country"
+                  name="country"
+                  type="text"
+                  value="India"
+                  disabled
+                  className="w-full bg-gray-100 cursor-not-allowed rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm"
+                />
+              </div>
+
+              {/* Pincode (string input) */}
+              <div>
+                <label htmlFor="pincode" className="block mb-1 text-sm font-medium text-gray-700">Pincode</label>
+                <input
+                  id="pincode"
+                  name="pincode"
+                  type="text"
+                  required
+                  pattern="\d{6}"
+                  maxLength={6}
+                  value={formData.pincode}
+                  onChange={handleInputChange}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
+                  placeholder="e.g. 400001"
+                />
               </div>
             </div>
 
@@ -153,10 +242,9 @@ const SignUp: React.FC = () => {
                   name="password"
                   type="password"
                   required
-                  autoComplete="new-password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="peer w-full rounded-lg border border-gray-300 px-4 py-2 pl-11 text-sm placeholder-gray-400 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
+                  className="peer w-full rounded-lg border border-gray-300 px-4 py-2 pl-11 text-sm shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
                   placeholder="Enter your password"
                 />
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -168,7 +256,7 @@ const SignUp: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full transform transition-transform duration-200 ease-in-out hover:scale-105 flex justify-center items-center py-2 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full transform transition-transform duration-200 ease-in-out hover:scale-105 flex justify-center items-center py-2 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Creating account...' : 'Create account'}
               </button>

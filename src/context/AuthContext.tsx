@@ -8,6 +8,11 @@ interface CustomerProfile {
   last_name: string;
   phone: string;
   address: string;
+  locality: string,
+  city: string,
+  state: string,
+  country: string,
+  pincode: string,
 }
 
 interface AuthContextType {
@@ -63,11 +68,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         options: {
           data: profile
             ? {
-                first_name: profile.first_name,
-                last_name: profile.last_name,
-                phone: profile.phone,
-                address: profile.address,
-              }
+              first_name: profile.first_name,
+              last_name: profile.last_name,
+              phone: profile.phone,
+              address: profile.address,
+              locality: profile.locality,
+              city: profile.city,
+              state: profile.state,
+              country: profile.country,
+              pincode: profile.pincode,
+            }
             : undefined,
         },
       });

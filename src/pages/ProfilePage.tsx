@@ -3,6 +3,7 @@ import { User, Mail, Phone, MapPin, Edit2, Save, X, Camera, Settings, LogOut } f
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
+import { indianStates } from '../data/states';
 
 interface CustomerProfile {
     id: string;
@@ -10,6 +11,11 @@ interface CustomerProfile {
     last_name: string;
     phone: string;
     address: string;
+    locality: string;
+    city: string;
+    state: string;
+    country: string;
+    pincode: string;
     created_at: string;
 }
 
@@ -24,9 +30,13 @@ const ProfilePage: React.FC = () => {
         last_name: '',
         phone: '',
         address: '',
+        locality: '',
+        city: '',
+        state: '',
+        country: '',
+        pincode: '',
     });
 
-    // Fetch user profile
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -50,6 +60,11 @@ const ProfilePage: React.FC = () => {
                         last_name: data.last_name || '',
                         phone: data.phone || '',
                         address: data.address || '',
+                        locality: data.locality || '',
+                        city: data.city || '',
+                        state: data.state || '',
+                        country: data.country || '',
+                        pincode: data.pincode || '',
                     });
                 }
             } catch (error) {
@@ -63,7 +78,7 @@ const ProfilePage: React.FC = () => {
         fetchProfile();
     }, [user]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setEditForm(prev => ({
             ...prev,
@@ -73,7 +88,6 @@ const ProfilePage: React.FC = () => {
 
     const handleSave = async () => {
         if (!user || !profile) return;
-
         setSaving(true);
         try {
             const { error } = await supabase
@@ -83,12 +97,15 @@ const ProfilePage: React.FC = () => {
                     last_name: editForm.last_name,
                     phone: editForm.phone,
                     address: editForm.address,
+                    locality: editForm.locality,
+                    city: editForm.city,
+                    state: editForm.state,
+                    country: editForm.country,
+                    pincode: editForm.pincode,
                 })
                 .eq('id', user.id);
 
-            if (error) {
-                throw error;
-            }
+            if (error) throw error;
 
             setProfile({
                 ...profile,
@@ -96,6 +113,11 @@ const ProfilePage: React.FC = () => {
                 last_name: editForm.last_name,
                 phone: editForm.phone,
                 address: editForm.address,
+                locality: editForm.locality,
+                city: editForm.city,
+                state: editForm.state,
+                country: editForm.country,
+                pincode: editForm.pincode,
             });
 
             setIsEditing(false);
@@ -115,6 +137,11 @@ const ProfilePage: React.FC = () => {
                 last_name: profile.last_name || '',
                 phone: profile.phone || '',
                 address: profile.address || '',
+                locality: profile.locality || '',
+                city: profile.city || '',
+                state: profile.state || '',
+                country: profile.country || '',
+                pincode: profile.pincode || '',
             });
         }
         setIsEditing(false);
@@ -166,10 +193,8 @@ const ProfilePage: React.FC = () => {
 
                 {/* Profile Content */}
                 <div className="bg-white rounded-b-lg shadow-sm">
-                    {/* Profile Header */}
                     <div className="px-6 py-8 border-b border-gray-200">
                         <div className="flex items-center space-x-6">
-                            {/* Avatar */}
                             <div className="relative">
                                 <div className="h-24 w-24 rounded-full bg-green-100 flex items-center justify-center">
                                     <User className="h-12 w-12 text-green-600" />
@@ -178,8 +203,6 @@ const ProfilePage: React.FC = () => {
                                     <Camera className="h-4 w-4 text-gray-600" />
                                 </button>
                             </div>
-
-                            {/* User Info */}
                             <div className="flex-1">
                                 <h2 className="text-3xl font-bold text-gray-900">
                                     {`${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'User'}
@@ -194,8 +217,6 @@ const ProfilePage: React.FC = () => {
                                     })}
                                 </p>
                             </div>
-
-                            {/* Edit Button */}
                             <div>
                                 {!isEditing ? (
                                     <button
@@ -231,7 +252,6 @@ const ProfilePage: React.FC = () => {
                     {/* Profile Details */}
                     <div className="px-6 py-8">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            {/* Personal Information */}
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
                                     <User className="h-5 w-5 text-green-600" />
@@ -239,7 +259,6 @@ const ProfilePage: React.FC = () => {
                                 </h3>
 
                                 <div className="space-y-6">
-                                    {/* First Name */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             First Name
@@ -250,15 +269,13 @@ const ProfilePage: React.FC = () => {
                                                 name="first_name"
                                                 value={editForm.first_name}
                                                 onChange={handleInputChange}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                                placeholder="Enter your first name"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500"
                                             />
                                         ) : (
                                             <p className="text-gray-900 py-2">{profile.first_name || 'Not provided'}</p>
                                         )}
                                     </div>
 
-                                    {/* Last Name */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             Last Name
@@ -269,29 +286,13 @@ const ProfilePage: React.FC = () => {
                                                 name="last_name"
                                                 value={editForm.last_name}
                                                 onChange={handleInputChange}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                                placeholder="Enter your last name"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500"
                                             />
                                         ) : (
                                             <p className="text-gray-900 py-2">{profile.last_name || 'Not provided'}</p>
                                         )}
                                     </div>
 
-                                    {/* Email */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Email Address
-                                        </label>
-                                        <div className="flex items-center gap-3 py-2">
-                                            <Mail className="h-5 w-5 text-gray-400" />
-                                            <span className="text-gray-900">{user?.email}</span>
-                                            <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
-                                                Verified
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* Phone */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             Phone Number
@@ -302,36 +303,111 @@ const ProfilePage: React.FC = () => {
                                                 name="phone"
                                                 value={editForm.phone}
                                                 onChange={handleInputChange}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                                placeholder="Enter your phone number"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500"
                                             />
                                         ) : (
                                             <p className="text-gray-900 py-2">{profile.phone || 'Not provided'}</p>
                                         )}
                                     </div>
 
-                                    {/* Address */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Address
-                                        </label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
                                         {isEditing ? (
                                             <textarea
                                                 name="address"
                                                 value={editForm.address}
                                                 onChange={handleInputChange}
                                                 rows={3}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                                placeholder="Enter your address"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500"
                                             />
                                         ) : (
                                             <p className="text-gray-900 py-2 whitespace-pre-line">{profile.address || 'Not provided'}</p>
                                         )}
                                     </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Locality</label>
+                                        {isEditing ? (
+                                            <textarea
+                                                name="address"
+                                                value={editForm.locality}
+                                                onChange={handleInputChange}
+                                                rows={3}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500"
+                                            />
+                                        ) : (
+                                            <p className="text-gray-900 py-2 whitespace-pre-line">{profile.locality || 'Not provided'}</p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
+                                        {isEditing ? (
+                                            <textarea
+                                                name="address"
+                                                value={editForm.city}
+                                                onChange={handleInputChange}
+                                                rows={3}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500"
+                                            />
+                                        ) : (
+                                            <p className="text-gray-900 py-2 whitespace-pre-line">{profile.city || 'Not provided'}</p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
+                                        {isEditing ? (
+                                            <select
+                                                name="state"
+                                                value={editForm.state}
+                                                onChange={handleInputChange}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500"
+                                            >
+                                                <option value="">Select your state</option>
+                                                {indianStates.map((state) => (
+                                                    <option key={state} value={state}>
+                                                        {state}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        ) : (
+                                            <p className="text-gray-900 py-2">{profile.state || 'Not provided'}</p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                                        {isEditing ? (
+                                            <textarea
+                                                name="address"
+                                                value={editForm.country}
+                                                onChange={handleInputChange}
+                                                rows={3}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500"
+                                            />
+                                        ) : (
+                                            <p className="text-gray-900 py-2 whitespace-pre-line">{profile.country || 'Not provided'}</p>
+                                        )}
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Pincode</label>
+                                        {isEditing ? (
+                                            <textarea
+                                                name="address"
+                                                value={editForm.pincode}
+                                                onChange={handleInputChange}
+                                                rows={3}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500"
+                                            />
+                                        ) : (
+                                            <p className="text-gray-900 py-2 whitespace-pre-line">{profile.pincode || 'Not provided'}</p>
+                                        )}
+                                    </div>
+
+
                                 </div>
                             </div>
 
-                            {/* Account Settings (optional) */}
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
                                     <Settings className="h-5 w-5 text-green-600" />
