@@ -1,45 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Eye, Download } from 'lucide-react';
-
-interface Order {
-  id: string;
-  customer: string;
-  date: string;
-  total: string;
-  status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
-  items: number;
-}
+import { Order } from '../../../types';
+import { getOrders, updateOrderStatus, exportOrders } from '../../../lib/api';
+import toast from 'react-hot-toast';
 
 const OrderManager: React.FC = () => {
-  const [orders] = useState<Order[]>([
-    {
-      id: '#12345',
-      customer: 'John Doe',
-      date: '2024-03-15',
-      total: '₹8,999',
-      status: 'Processing',
-      items: 3
-    },
-    {
-      id: '#12344',
-      customer: 'Jane Smith',
-      date: '2024-03-15',
-      total: '₹12,999',
-      status: 'Shipped',
-      items: 2
-    },
-    {
-      id: '#12343',
-      customer: 'Mike Johnson',
-      date: '2024-03-14',
-      total: '₹5,999',
-      status: 'Delivered',
-      items: 1
-    }
-  ]);
-
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
+
+  useEffect(() => {
+    loadOrders();
+  }, []);
+
+  const loadOrders = async () => {
+    try {
+      const data = await getOrders();
+      setOrders(data);
+    } catch (error) {
+      toast.error('Failed to load orders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (orderId: string, status: Order['status']) => {
+    try {
+      await updateOrderStatus(orderId, status);
+      await loadOrders();
+      toast.success('Order status updated successfully');
+    } catch (error) {
+      toast.error('Failed to update order status');
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const data = await exportOrders();
+      
+      // Create CSV file and download
+      const blob = new Blob([data], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `orders-${new Date().toISOString()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('Orders exported successfully');
+    } catch (error) {
+      toast.error('Failed to export orders');
+    }
+  };
 
   const getStatusColor = (status: Order['status']) => {
     switch (status) {
@@ -58,13 +73,31 @@ const OrderManager: React.FC = () => {
     }
   };
 
+  const filteredOrders = orders.filter(order => {
+    const matchesSearch = 
+      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.user_id.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = !statusFilter || order.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-medium text-gray-900">Order Management</h2>
         <button
-          onClick={() => console.log('Export orders')}
+          onClick={handleExport}
           className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center space-x-2"
         >
           <Download className="h-5 w-5" />
@@ -135,27 +168,35 @@ const OrderManager: React.FC = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <tr key={order.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {order.id}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {order.customer}
+                  {order.user_id}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {order.date}
+                  {new Date(order.created_at).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {order.items} items
+                  {order.items.length} items
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {order.total}
+                  ₹{order.total.toLocaleString('en-IN')}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.status)}`}>
-                    {order.status}
-                  </span>
+                  <select
+                    value={order.status}
+                    onChange={(e) => handleStatusChange(order.id, e.target.value as Order['status'])}
+                    className={`px-2 text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.status)}`}
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button className="text-green-600 hover:text-green-900">

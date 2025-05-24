@@ -1,57 +1,91 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash, Eye, EyeOff } from 'lucide-react';
-
-interface Banner {
-  id: number;
-  title: string;
-  description: string;
-  image: string;
-  active: boolean;
-  startDate: string;
-  endDate: string;
-}
+import { Banner } from '../../../types';
+import { getBanners, createBanner, updateBanner, deleteBanner } from '../../../lib/api';
+import toast from 'react-hot-toast';
 
 const BannerManager: React.FC = () => {
-  const [banners] = useState<Banner[]>([
-    {
-      id: 1,
-      title: "Summer Sale",
-      description: "Get 20% off on all indoor plants",
-      image: "https://images.pexels.com/photos/3097770/pexels-photo-3097770.jpeg",
-      active: true,
-      startDate: "2024-03-01",
-      endDate: "2024-03-31"
-    },
-    {
-      id: 2,
-      title: "New Arrivals",
-      description: "Check out our latest collection",
-      image: "https://images.pexels.com/photos/4503273/pexels-photo-4503273.jpeg",
-      active: false,
-      startDate: "2024-04-01",
-      endDate: "2024-04-30"
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadBanners();
+  }, []);
+
+  const loadBanners = async () => {
+    try {
+      const data = await getBanners();
+      setBanners(data);
+    } catch (error) {
+      toast.error('Failed to load banners');
+    } finally {
+      setLoading(false);
     }
-  ]);
-
-  const toggleBanner = (bannerId: number) => {
-    // Implementation for toggling banner visibility
-    console.log('Toggle banner:', bannerId);
   };
 
-  const handleAddBanner = () => {
-    // Implementation for adding new banner
-    console.log('Add new banner');
+  const toggleBanner = async (banner: Banner) => {
+    try {
+      await updateBanner(banner.id, { active: !banner.active });
+      await loadBanners();
+      toast.success(`Banner ${banner.active ? 'deactivated' : 'activated'} successfully`);
+    } catch (error) {
+      toast.error('Failed to update banner');
+    }
   };
 
-  const handleEditBanner = (banner: Banner) => {
-    // Implementation for editing banner
-    console.log('Edit banner:', banner);
+  const handleAddBanner = async () => {
+    const newBanner: Omit<Banner, 'id' | 'created_at'> = {
+      title: 'New Banner',
+      description: 'Banner description',
+      image: 'https://images.pexels.com/photos/3097770/pexels-photo-3097770.jpeg',
+      active: false,
+      start_date: new Date().toISOString(),
+      end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+    };
+
+    try {
+      await createBanner(newBanner);
+      await loadBanners();
+      toast.success('Banner added successfully');
+    } catch (error) {
+      toast.error('Failed to add banner');
+    }
   };
 
-  const handleDeleteBanner = (bannerId: number) => {
-    // Implementation for deleting banner
-    console.log('Delete banner:', bannerId);
+  const handleEditBanner = async (banner: Banner) => {
+    try {
+      const updates = {
+        title: window.prompt('Enter banner title:', banner.title) || banner.title,
+        description: window.prompt('Enter banner description:', banner.description) || banner.description
+      };
+      
+      await updateBanner(banner.id, updates);
+      await loadBanners();
+      toast.success('Banner updated successfully');
+    } catch (error) {
+      toast.error('Failed to update banner');
+    }
   };
+
+  const handleDeleteBanner = async (bannerId: string) => {
+    if (!window.confirm('Are you sure you want to delete this banner?')) return;
+    
+    try {
+      await deleteBanner(bannerId);
+      await loadBanners();
+      toast.success('Banner deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete banner');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -79,7 +113,7 @@ const BannerManager: React.FC = () => {
               />
               <div className="absolute top-2 right-2 flex space-x-2">
                 <button
-                  onClick={() => toggleBanner(banner.id)}
+                  onClick={() => toggleBanner(banner)}
                   className={`p-2 rounded-full ${
                     banner.active
                       ? 'bg-green-500 hover:bg-green-600'
@@ -94,7 +128,7 @@ const BannerManager: React.FC = () => {
               <h3 className="text-lg font-medium text-gray-900">{banner.title}</h3>
               <p className="text-gray-600 mt-1">{banner.description}</p>
               <div className="mt-4 text-sm text-gray-500">
-                <p>Active: {banner.startDate} to {banner.endDate}</p>
+                <p>Active: {new Date(banner.start_date).toLocaleDateString()} to {new Date(banner.end_date).toLocaleDateString()}</p>
               </div>
               <div className="mt-4 flex justify-end space-x-2">
                 <button

@@ -4,6 +4,7 @@ export interface Product {
   wholesell_price?: number;
   price: number;
   image?: string;
+  images?: string[];
   category: string;
   description: string;
   care: string;

@@ -1,51 +1,104 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash, ChevronUp, ChevronDown } from 'lucide-react';
-
-interface FAQ {
-  id: number;
-  question: string;
-  answer: string;
-  category: string;
-  order: number;
-}
+import { FAQ } from '../../../types';
+import { getFAQs, createFAQ, updateFAQ, deleteFAQ } from '../../../lib/api';
+import toast from 'react-hot-toast';
 
 const FAQManager: React.FC = () => {
-  const [faqs] = useState<FAQ[]>([
-    {
-      id: 1,
-      question: "Do you ship plants nationwide?",
-      answer: "Yes, we ship to all 50 states. Plants are carefully packaged to ensure they arrive in perfect condition.",
-      category: "Shipping",
-      order: 1
-    },
-    {
-      id: 2,
-      question: "What if my plant arrives damaged?",
-      answer: "Contact us within 48 hours with photos, and we'll arrange a replacement or refund.",
-      category: "Returns",
-      order: 2
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadFAQs();
+  }, []);
+
+  const loadFAQs = async () => {
+    try {
+      const data = await getFAQs();
+      setFaqs(data);
+    } catch (error) {
+      toast.error('Failed to load FAQs');
+    } finally {
+      setLoading(false);
     }
-  ]);
-
-  const handleAddFAQ = () => {
-    // Implementation for adding new FAQ
-    console.log('Add new FAQ');
   };
 
-  const handleEditFAQ = (faq: FAQ) => {
-    // Implementation for editing FAQ
-    console.log('Edit FAQ:', faq);
+  const handleAddFAQ = async () => {
+    const newFAQ: Omit<FAQ, 'id' | 'created_at'> = {
+      question: 'New Question',
+      answer: 'Answer to the question',
+      category: 'General',
+      order: faqs.length + 1
+    };
+
+    try {
+      await createFAQ(newFAQ);
+      await loadFAQs();
+      toast.success('FAQ added successfully');
+    } catch (error) {
+      toast.error('Failed to add FAQ');
+    }
   };
 
-  const handleDeleteFAQ = (faqId: number) => {
-    // Implementation for deleting FAQ
-    console.log('Delete FAQ:', faqId);
+  const handleEditFAQ = async (faq: FAQ) => {
+    try {
+      const updates = {
+        question: window.prompt('Enter question:', faq.question) || faq.question,
+        answer: window.prompt('Enter answer:', faq.answer) || faq.answer,
+        category: window.prompt('Enter category:', faq.category) || faq.category
+      };
+      
+      await updateFAQ(faq.id, updates);
+      await loadFAQs();
+      toast.success('FAQ updated successfully');
+    } catch (error) {
+      toast.error('Failed to update FAQ');
+    }
   };
 
-  const handleReorder = (faqId: number, direction: 'up' | 'down') => {
-    // Implementation for reordering FAQs
-    console.log('Reorder FAQ:', faqId, direction);
+  const handleDeleteFAQ = async (faqId: string) => {
+    if (!window.confirm('Are you sure you want to delete this FAQ?')) return;
+    
+    try {
+      await deleteFAQ(faqId);
+      await loadFAQs();
+      toast.success('FAQ deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete FAQ');
+    }
   };
+
+  const handleReorder = async (faq: FAQ, direction: 'up' | 'down') => {
+    const currentIndex = faqs.findIndex(f => f.id === faq.id);
+    if (
+      (direction === 'up' && currentIndex === 0) ||
+      (direction === 'down' && currentIndex === faqs.length - 1)
+    ) return;
+
+    const newOrder = direction === 'up' ? faq.order - 1 : faq.order + 1;
+    const otherFaq = faqs.find(f => f.order === newOrder);
+
+    if (!otherFaq) return;
+
+    try {
+      await Promise.all([
+        updateFAQ(faq.id, { order: newOrder }),
+        updateFAQ(otherFaq.id, { order: faq.order })
+      ]);
+      await loadFAQs();
+      toast.success('FAQ reordered successfully');
+    } catch (error) {
+      toast.error('Failed to reorder FAQ');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -79,7 +132,7 @@ const FAQManager: React.FC = () => {
                 <div className="flex items-center space-x-2 ml-4">
                   <div className="flex flex-col">
                     <button
-                      onClick={() => handleReorder(faq.id, 'up')}
+                      onClick={() => handleReorder(faq, 'up')}
                       disabled={index === 0}
                       className={`p-1 ${
                         index === 0 ? 'text-gray-300' : 'text-gray-500 hover:text-gray-700'
@@ -88,7 +141,7 @@ const FAQManager: React.FC = () => {
                       <ChevronUp className="h-5 w-5" />
                     </button>
                     <button
-                      onClick={() => handleReorder(faq.id, 'down')}
+                      onClick={() => handleReorder(faq, 'down')}
                       disabled={index === faqs.length - 1}
                       className={`p-1 ${
                         index === faqs.length - 1 ? 'text-gray-300' : 'text-gray-500 hover:text-gray-700'

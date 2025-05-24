@@ -72,15 +72,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <p className="font-bold text-gray-900 mt-1">₹{product.price.toLocaleString('en-IN')}</p>
         </div>
         
-        <div className="flex justify-between items-center mt-2 text-xs text-gray-600">
+        <div className="flex justify-between items-center mt-2 text-sm text-gray-600">
           <div className={getLightLevel(product.light)}>
             <Sun className="h-3.5 w-3.5 mr-1" />
-            <span>{product.light === 'low' ? 'Low Light' : product.light === 'medium' ? 'Medium Light' : 'Bright Light'}</span>
+            <span>{product.light === 'low' ? 'Low' : product.light === 'medium' ? 'Medium' : 'Bright'}</span>
           </div>
           
           <div className={getWaterLevel(product.water)}>
             <Droplet className="h-3.5 w-3.5 mr-1" />
-            <span>{product.water === 'low' ? 'Low Water' : product.water === 'medium' ? 'Medium Water' : 'High Water'}</span>
+            <span>{product.water === 'low' ? 'Low' : product.water === 'medium' ? 'Medium' : 'High'}</span>
           </div>
         </div>
         

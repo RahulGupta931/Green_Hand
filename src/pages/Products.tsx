@@ -15,7 +15,7 @@ const Products: React.FC = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const categoryParam = params.get('category');
-    
+
     if (categoryParam) {
       // Convert URL param to title case for matching with our categories
       const formattedCategory = categoryParam.charAt(0).toUpperCase() + categoryParam.slice(1);
@@ -27,21 +27,21 @@ const Products: React.FC = () => {
 
   useEffect(() => {
     let result = [...products];
-    
+
     // Filter by category
     if (selectedCategory !== "All") {
       result = result.filter(product => product.category === selectedCategory);
     }
-    
+
     // Filter by search term
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      result = result.filter(product => 
-        product.name.toLowerCase().includes(term) || 
+      result = result.filter(product =>
+        product.name.toLowerCase().includes(term) ||
         product.description.toLowerCase().includes(term)
       );
     }
-    
+
     // Sort
     switch (sortBy) {
       case "price-low-high":
@@ -64,7 +64,7 @@ const Products: React.FC = () => {
           return a.id - b.id;
         });
     }
-    
+
     setFilteredProducts(result);
   }, [selectedCategory, searchTerm, sortBy]);
 
@@ -72,11 +72,11 @@ const Products: React.FC = () => {
     <div className="bg-gray-50 min-h-screen">
       <div className="pt-8 pb-16">
         <div className="container mx-auto px-4">
-          <div className="mb-8">
+          {/* <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Our Plants</h1>
             <p className="text-gray-600 mt-2">Discover the perfect plants for your space</p>
-          </div>
-          
+          </div> */}
+
           {/* Mobile Filters Toggle */}
           <div className="lg:hidden mb-4">
             <button
@@ -87,31 +87,14 @@ const Products: React.FC = () => {
               <span>Filters</span>
             </button>
           </div>
-          
+
           <div className="flex flex-col lg:flex-row gap-6">
+
             {/* Filters - Desktop */}
             <div className="hidden lg:block w-64 flex-shrink-0">
               <div className="bg-white rounded-lg shadow-sm p-6">
+
                 <div className="mb-6">
-                  <h3 className="font-medium text-gray-900 mb-3">Categories</h3>
-                  <div className="space-y-2">
-                    {categories.map((category) => (
-                      <button
-                        key={category}
-                        className={`block w-full text-left px-2 py-1.5 rounded text-sm transition-colors ${
-                          selectedCategory === category 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'text-gray-700 hover:bg-gray-100'
-                        }`}
-                        onClick={() => setSelectedCategory(category)}
-                      >
-                        {category}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
                   <h3 className="font-medium text-gray-900 mb-3">Search</h3>
                   <div className="relative">
                     <input
@@ -131,23 +114,44 @@ const Products: React.FC = () => {
                     )}
                   </div>
                 </div>
+
+                <div className="mb-6">
+                  <h3 className="font-medium text-gray-900 mb-3">Categories</h3>
+                  <div className="space-y-2">
+                    {categories.map((category) => (
+                      <button
+                        key={category}
+                        className={`block w-full text-left px-2 py-1.5 rounded text-sm transition-colors ${selectedCategory === category
+                          ? 'bg-green-100 text-green-800'
+                          : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        onClick={() => setSelectedCategory(category)}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+
               </div>
             </div>
-            
+
+
             {/* Filters - Mobile */}
             {isMobileFiltersOpen && (
               <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
                 <div className="bg-white rounded-lg shadow-lg w-full max-w-sm">
                   <div className="flex items-center justify-between p-4 border-b">
                     <h3 className="font-medium">Filters</h3>
-                    <button 
+                    <button
                       onClick={() => setIsMobileFiltersOpen(false)}
                       className="text-gray-400 hover:text-gray-600"
                     >
                       <X className="h-5 w-5" />
                     </button>
                   </div>
-                  
+
                   <div className="p-4">
                     <div className="mb-6">
                       <h4 className="font-medium text-gray-900 mb-3">Categories</h4>
@@ -155,11 +159,10 @@ const Products: React.FC = () => {
                         {categories.map((category) => (
                           <button
                             key={category}
-                            className={`block w-full text-left px-2 py-1.5 rounded text-sm transition-colors ${
-                              selectedCategory === category 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'text-gray-700 hover:bg-gray-100'
-                            }`}
+                            className={`block w-full text-left px-2 py-1.5 rounded text-sm transition-colors ${selectedCategory === category
+                              ? 'bg-green-100 text-green-800'
+                              : 'text-gray-700 hover:bg-gray-100'
+                              }`}
                             onClick={() => {
                               setSelectedCategory(category);
                               setIsMobileFiltersOpen(false);
@@ -170,7 +173,7 @@ const Products: React.FC = () => {
                         ))}
                       </div>
                     </div>
-                    
+
                     <div>
                       <h4 className="font-medium text-gray-900 mb-3">Search</h4>
                       <div className="relative">
@@ -192,9 +195,9 @@ const Products: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="p-4 border-t flex justify-end">
-                    <button 
+                    <button
                       onClick={() => setIsMobileFiltersOpen(false)}
                       className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
                     >
@@ -204,12 +207,12 @@ const Products: React.FC = () => {
                 </div>
               </div>
             )}
-            
+
             {/* Product List */}
             <div className="flex-grow">
               <div className="flex justify-between items-center mb-6">
                 <p className="text-gray-600">{filteredProducts.length} plants</p>
-                
+
                 <div className="relative">
                   <select
                     value={sortBy}
@@ -227,13 +230,13 @@ const Products: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
+
               {filteredProducts.length > 0 ? (
                 <ProductGrid products={filteredProducts} />
               ) : (
                 <div className="text-center py-12 bg-white rounded-lg shadow-sm">
                   <p className="text-gray-600">No plants found matching your criteria.</p>
-                  <button 
+                  <button
                     onClick={() => {
                       setSelectedCategory("All");
                       setSearchTerm("");

@@ -1,14 +1,24 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { X, ShoppingCart, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import QuantityInput from '../components/QuantityInput';
 
 const Cart: React.FC = () => {
   const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const handleCheckout = () => {
+    if (!isAuthenticated) {
+      // Redirect to login with return path
+      navigate('/login', { state: { from: location.pathname } });
+      return;
+    }
+    
+    // Proceed with checkout
     alert('This would proceed to checkout in a complete implementation.');
   };
   
@@ -52,7 +62,6 @@ const Cart: React.FC = () => {
                 {cart.map(item => (
                   <div key={item.product.id} className="p-6">
                     <div className="flex">
-                      {/* Product Image (mobile: top, desktop: left) */}
                       <div className="w-20 h-20 flex-shrink-0 bg-gray-50 rounded overflow-hidden mr-4">
                         <img 
                           src={item.product.image} 
@@ -61,7 +70,6 @@ const Cart: React.FC = () => {
                         />
                       </div>
                       
-                      {/* Product Details */}
                       <div className="flex-grow">
                         <div className="flex justify-between">
                           <div>
@@ -173,9 +181,18 @@ const Cart: React.FC = () => {
                 onClick={handleCheckout}
                 className="w-full bg-green-600 text-white py-3 px-6 rounded-md font-medium hover:bg-green-700 flex items-center justify-center"
               >
-                <span>Proceed to Checkout</span>
+                <span>{isAuthenticated ? 'Proceed to Checkout' : 'Sign in to Checkout'}</span>
                 <ArrowRight className="ml-2 h-5 w-5" />
               </button>
+              
+              {!isAuthenticated && (
+                <button 
+                  onClick={handleCheckout}
+                  className="w-full mt-4 border border-gray-300 bg-white text-gray-700 py-3 px-6 rounded-md font-medium hover:bg-gray-50 flex items-center justify-center"
+                >
+                  Continue as Guest
+                </button>
+              )}
             </div>
           </div>
         </div>

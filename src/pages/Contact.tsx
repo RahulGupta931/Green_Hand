@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Send, Clock } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, MessageSquare, Clock } from 'lucide-react';
 
 const Contact: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
@@ -154,7 +154,7 @@ const Contact: React.FC = () => {
             </div>
           </div>
           
-          {/* <div className="mt-12 bg-white rounded-lg shadow-sm p-8">
+          <div className="mt-12 bg-white rounded-lg shadow-sm p-8">
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 text-green-600 rounded-full mb-4">
                 <MessageSquare className="h-8 w-8" />
@@ -184,7 +184,7 @@ const Contact: React.FC = () => {
                 <p className="text-gray-600">Yes, local pickup is available at our Plant City location during business hours.</p>
               </div>
             </div>
-          </div> */}
+          </div>
         </div>
       </div>
     </div>
