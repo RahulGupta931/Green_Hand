@@ -17,6 +17,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Faq from './pages/Faq';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   return (
@@ -40,6 +41,18 @@ function App() {
             <Route path="/privacy" element={<Layout><PrivacyPolicy /></Layout>} />
             <Route path="/terms" element={<Layout><TermsAndConditions /></Layout>} />
             <Route path="/search" element={<Layout><Products /></Layout>} />
+            
+            {/* Protected Routes */}
+            <Route 
+              path="/profile" 
+              element={
+                <Layout>
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                </Layout>
+              } 
+            />
             <Route
               path="/cart"
               element={
@@ -50,6 +63,8 @@ function App() {
                 </Layout>
               }
             />
+            
+            {/* Other Public Routes */}
             <Route path="/care-guide" element={<Layout><CareGuide /></Layout>} />
             <Route path="/contact" element={<Layout><Contact /></Layout>} />
           </Routes>
