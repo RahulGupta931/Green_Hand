@@ -1,22 +1,44 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Leaf, Mail, Lock, User } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { Mail, Lock, User, Phone, MapPin } from 'lucide-react';
+import { useAuth, CustomerProfile } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import logo from '../assets/greenhand_logo.png'
 
 const SignUp: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    fullName: '',
+    phone: '',
+    address: ''
+  });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { signUp } = useAuth();
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { error } = await signUp(email, password);
+      // Prepare profile data
+      const profileData: CustomerProfile = {
+        full_name: formData.fullName,
+        phone: formData.phone,
+        address: formData.address
+      };
+
+      // Create account with profile data
+      const { error } = await signUp(formData.email, formData.password, profileData);
       
       if (error) {
         throw error;
@@ -25,6 +47,7 @@ const SignUp: React.FC = () => {
       toast.success('Account created successfully! Please check your email to verify your account.');
       navigate('/login');
     } catch (error) {
+      console.error('Signup error:', error);
       toast.error('Error creating account');
     } finally {
       setLoading(false);
@@ -34,9 +57,9 @@ const SignUp: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <Leaf className="h-12 w-12 text-green-600" />
-        </div>
+        <Link to="/" className="flex justify-center">
+          <img src={logo} alt="GreenHand Logo" className="h-14 w-14" />
+        </Link>
         <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
           Create your account
         </h2>
@@ -48,6 +71,28 @@ const SignUp: React.FC = () => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow-sm rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {/* Full Name */}
+            <div>
+              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+                Full Name
+              </label>
+              <div className="mt-1 relative">
+                <input
+                  id="fullName"
+                  name="fullName"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                  placeholder="Enter your full name"
+                />
+                <User className="h-5 w-5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
+              </div>
+            </div>
+
+            {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email address
@@ -59,14 +104,58 @@ const SignUp: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={formData.email}
+                  onChange={handleInputChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                  placeholder="Enter your email"
                 />
                 <Mail className="h-5 w-5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
               </div>
             </div>
 
+            {/* Phone */}
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                Phone Number
+              </label>
+              <div className="mt-1 relative">
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  required
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                  placeholder="Enter your phone number"
+                />
+                <Phone className="h-5 w-5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
+              </div>
+            </div>
+
+            {/* Address */}
+            <div>
+              <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+                Address
+              </label>
+              <div className="mt-1 relative">
+                <textarea
+                  id="address"
+                  name="address"
+                  rows={3}
+                  autoComplete="street-address"
+                  required
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 resize-none"
+                  placeholder="Enter your full address"
+                />
+                <MapPin className="h-5 w-5 text-gray-400 absolute right-3 top-3" />
+              </div>
+            </div>
+
+            {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Password
@@ -78,9 +167,10 @@ const SignUp: React.FC = () => {
                   type="password"
                   autoComplete="new-password"
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={handleInputChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                  placeholder="Enter your password"
                 />
                 <Lock className="h-5 w-5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
               </div>

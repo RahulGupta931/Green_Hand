@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, TrendingUp, Gift, Star, Clock } from 'lucide-react';
 import ProductGrid from '../components/ProductGrid';
 import { products } from '../data/products';
-import Slider from '../components/Slider';
 import Hero from '../components/Hero';
 import Benefits from '../components/Benefits';
 
