@@ -2,12 +2,17 @@
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public.customer_profiles (id, full_name, phone, address)
+  INSERT INTO public.customer_profiles (id, first_name, last_name, phone, address, locality, city, state, pincode)
   VALUES (
     new.id,
-    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'first_name',
+    new.raw_user_meta_data->>'last_name',
     new.raw_user_meta_data->>'phone',
     new.raw_user_meta_data->>'address'
+    new.raw_user_meta_data->>'locality',
+    new.raw_user_meta_data->>'city',
+    new.raw_user_meta_data->>'state',
+    new.raw_user_meta_data->>'pincode',
   );
   RETURN new;
 END;
